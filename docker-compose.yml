@@ -1,0 +1,12 @@
+version: '3.7'
+services:
+  test:
+    build:
+      context: .
+      target: dev
+    command: cabal new-test
+    volumes:
+      # - stack-work:/usr/local/src/.stack-work
+      - .:/usr/local/src
+volumes:
+  stack-work: {}

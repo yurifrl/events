@@ -14,16 +14,15 @@ spec = do
                   4285
                   "SLICE_IT"
                   "1bb53ed1-787b-4543-9def-ea18eef7902e"
-    
+
     describe "report" $ do
-      it "can filter by Number of purchases per hour, broken down by amount bracket  ..." $ do
-         print $ report (aggregate [event])
-         -- report (aggregate [event]) `shouldMatchList` [Agg "2011-12-03:10|10-50" 1]
-      
-      --it "can filter by Number of purchases per hour, broken down by amount bracket and payment method" $ do
-        -- report (aggregate [event]) `shouldMatchList` [Agg "2011-12-03:10|10-50|SLICE_IT" 1]
-        
-      
+      -- it "can filter by Number of purchases per hour, broken down by amount bracket  ..." $ do
+      --    print $ report (aggregate [event])
+      --    -- report (aggregate [event]) `shouldMatchList` [Agg "2011-12-03:10|10-50" 1]
+
+      -- --it "can filter by Number of purchases per hour, broken down by amount bracket and payment method" $ do
+      --   -- report (aggregate [event]) `shouldMatchList` [Agg "2011-12-03:10|10-50|SLICE_IT" 1]
+
     describe "Aggregate" $ do
       it "can aggregate single event" $ do
         aggregate [event] `shouldMatchList` [ Agg "2011-12-03:10|10-50" 1
@@ -35,7 +34,7 @@ spec = do
       it "should generate the correct number of aggregates" $ do
         let aggs = aggregate [event, event]
         length aggs `shouldBe` 5
-      
+
       it "can aggregate multiple events" $ do
         aggregate [event, event] `shouldMatchList`
             [ Agg "2011-12-03:10|10-50" 2
@@ -44,7 +43,7 @@ spec = do
             , Agg "2011-12-03|1bb53ed1-787b-4543-9def-ea18eef7902e" 2
             , Agg "1bb53ed1-787b-4543-9def-ea18eef7902e|SLICE_IT" 2
             ]
-           
+
       it "can aggregate multiple events" $ do
         let events = [ Event "2011-12-03T10:15:30Z" 4285 "SLICE_IT" "1bb53ed1-787b-4543-9def-ea18eef7902e"
                      , Event "2011-12-03T12:15:30Z" 1142 "PAY_NOW" "1bb53ed1-787b-4543-9def-ea18eef7902e"
@@ -70,5 +69,3 @@ spec = do
           , Agg "<10|PAY_NOW" 1
           , Agg ">500|PAY_LATER" 1
           ]
-
-            

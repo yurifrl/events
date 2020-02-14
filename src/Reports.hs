@@ -27,10 +27,10 @@ amountBracket (Event _ amount _ _) | amount < 1000 = "<10"
                                    | amount < 10000 = "50-100"
                                    | amount < 50000 = "100-500"
                                    | otherwise = ">500"
-                                   
+
 -- check if datapoint is equal aggregate datapoint
 matchDatapoint :: String -> Aggregate -> Bool
-matchDatapoint datapoint (Agg dp _) = dp == datapoint 
+matchDatapoint datapoint (Agg dp _) = dp == datapoint
 
 -- bump the aggregate event if the datapoint is the same
 bumpAggregate :: String -> Aggregate -> Aggregate
@@ -58,6 +58,6 @@ aggregate events = foldl (\acc event ->
     addAggregate (merchantID ++ "|" ++ paymentMethod) $
     acc
   ) [] events
-  
---report :: [Aggregate] -> [Aggregate]
-report aggs = filter (\x -> True) (map (\ (Agg dp _) -> splitOn "|" dp) aggs)
+
+-- --report :: [Aggregate] -> [Aggregate]
+-- report aggs = filter (\x -> True) (map (\ (Agg dp _) -> splitOn "|" dp) aggs)

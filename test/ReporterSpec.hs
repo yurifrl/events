@@ -4,7 +4,7 @@ module ReporterSpec
 
 import Test.Hspec
 
-import Reports (Event(..), Aggregate(..), aggregate, report)
+import Reports (Event(..), Aggregate(..), aggregate)
 
 spec :: Spec
 spec = do
@@ -14,14 +14,6 @@ spec = do
                   4285
                   "SLICE_IT"
                   "1bb53ed1-787b-4543-9def-ea18eef7902e"
-
-    describe "report" $ do
-      -- it "can filter by Number of purchases per hour, broken down by amount bracket  ..." $ do
-      --    print $ report (aggregate [event])
-      --    -- report (aggregate [event]) `shouldMatchList` [Agg "2011-12-03:10|10-50" 1]
-
-      -- --it "can filter by Number of purchases per hour, broken down by amount bracket and payment method" $ do
-      --   -- report (aggregate [event]) `shouldMatchList` [Agg "2011-12-03:10|10-50|SLICE_IT" 1]
 
     describe "Aggregate" $ do
       it "can aggregate single event" $ do

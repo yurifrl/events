@@ -1,6 +1,7 @@
-module Reports (Event(..), Aggregate(..), aggregate, report) where
+module Reports (Event(..), Aggregate(..), aggregate) where
 
 import Data.List.Split (splitOn)
+import Data.List (intercalate)
 
 type PaymentMethod = String
 
@@ -20,7 +21,7 @@ hour (Event date _ _ _) = let (day, 'T':time) = break (== 'T') date
 day :: Event -> String
 day (Event date _ _ _) = takeWhile (/= 'T') $ date
 
--- separete ammount into brackets
+-- separate ammount into brackets
 amountBracket :: Event -> String
 amountBracket (Event _ amount _ _) | amount < 1000 = "<10"
                                    | amount < 5000 = "10-50"
@@ -39,25 +40,25 @@ bumpAggregate datapoint (Agg dp events) | dp /= datapoint = Agg dp events
 
 -- loop through aggregates and bump the ones that match datapoint
 buildAggregates :: String -> [Aggregate] -> [Aggregate]
-buildAggregates datapoint aggrs = flip map [0..length aggrs -1] $ \i ->
-  bumpAggregate datapoint (aggrs !! i)
+buildAggregates datapoint aggrs = map build range
+  where build = bumpAggregate datapoint . (aggrs !!)
+        range = [0..length aggrs - 1]
+
 -- apply new aggreate into the aggregates list
 addAggregate :: String -> [Aggregate] -> [Aggregate]
-addAggregate datapoint aggrs =
-  if any (matchDatapoint datapoint) aggrs
-  then buildAggregates datapoint aggrs
-  else aggrs ++ [Agg datapoint 1]
+addAggregate datapoint aggrs | any (matchDatapoint datapoint) aggrs = buildAggregates datapoint aggrs
+addAggregate datapoint aggrs | otherwise = aggrs ++ [Agg datapoint 1]
 
+-- breaks event into it's aggreate
+eventFold :: Event -> [Aggregate] -> [Aggregate]
+eventFold event@(Event _ _ paymentMethod merchantID) acc =
+  addAggregate (intercalate "|" [hour event, amountBracket event]) $
+  addAggregate (intercalate "|" [hour event, amountBracket event, paymentMethod]) $
+  addAggregate (intercalate "|" [amountBracket event, paymentMethod]) $
+  addAggregate (intercalate "|" [day event, merchantID]) $
+  addAggregate (intercalate "|" [merchantID, paymentMethod]) $
+  acc
+
+-- given events matches by it's format and returns the aggregate list
 aggregate :: [Event] -> [Aggregate]
-aggregate events = foldl (\acc event ->
-  let (Event _ _ paymentMethod merchantID) = event in
-    addAggregate (hour event ++ "|" ++ amountBracket event) $
-    addAggregate (hour event ++ "|" ++ amountBracket event ++ "|" ++ paymentMethod) $
-    addAggregate (amountBracket event ++ "|" ++ paymentMethod) $
-    addAggregate (day event ++ "|" ++ merchantID) $
-    addAggregate (merchantID ++ "|" ++ paymentMethod) $
-    acc
-  ) [] events
-
--- --report :: [Aggregate] -> [Aggregate]
--- report aggs = filter (\x -> True) (map (\ (Agg dp _) -> splitOn "|" dp) aggs)
+aggregate events = foldr eventFold [] events
